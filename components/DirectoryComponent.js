@@ -4,7 +4,7 @@ import { ListItem } from 'react-native-elements';           // ListItem will wra
 
 
 
-function Directory(props) {             // "props" bc Directory receives props from its parent Main comp
+function Directory(props) {             // Pass a param of "props" bc Directory receives props from its parent Main comp
     
     // Define function used in FlatList
     const renderDirectoryItem = ({item}) => {         // In this arrow fxn, for the params, by default, FlatLine passes an object as argument. We're only interested in one property of that object, item (destructured object)
@@ -12,6 +12,7 @@ function Directory(props) {             // "props" bc Directory receives props f
             <ListItem  
                 title={item.name}                     // Destructure item property
                 subtitle={item.description}
+                onPress={() => props.onPress(item.id)}
                 leftAvatar={{ source: require('./images/react-lake.jpg')}}         // leftAvatar prop requires an object. Need double {} - first {} allows us to use JS in JSX (React HTML), second {} defines object literal. Object takes a property of source, plus a nodeJS "require"  
             />
         )
