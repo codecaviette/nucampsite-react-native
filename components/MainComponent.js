@@ -3,22 +3,20 @@
 
 
 import React, { Component } from 'react';
+import Home from './HomeComponent';
 import Directory from './DirectoryComponent';
 import CampsiteInfo from './CampsiteInfoComponent';
 import { View, Platform } from 'react-native';
-import { createStackNavigator } from 'react-navigation';
+import { createStackNavigator, createDrawerNavigator } from 'react-navigation';
 
-
-// Create Stack Navigator, similar to Route components in React
-// Store it in a const variable
-const DirectoryNavigator = createStackNavigator(            // createStackNavigator is a fxn that requires one argument called a router configuration object. In this argument is where we set what's available to stack.
+const DirectoryNavigator = createStackNavigator(
     {
-        Directory: { screen: Directory },                   // This is the router config object and it's where we set what's available to Stack Nav
+        Directory: { screen: Directory },
         CampsiteInfo: { screen: CampsiteInfo }
     },
-    {                                                       // Optional second argument
-        initialRouteName: 'Directory',                      // When app opens, it'll default to showing this component
-        navigationOptions: {                                // Configure settings for header
+    {
+        initialRouteName: 'Directory',
+        navigationOptions: {
             headerStyle: {
                 backgroundColor: '#5637DD'
             },
@@ -30,17 +28,42 @@ const DirectoryNavigator = createStackNavigator(            // createStackNaviga
     }
 );
 
+const HomeNavigator = createStackNavigator(
+    {
+        Home: { screen: Home }
+    },
+    {
+        navigationOptions: {
+            headerStyle: {
+                backgroundColor: '#5637DD'
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+                color: '#fff'
+            }
+        }
+    }
+);
 
-class Main extends Component {              // We use class component so that we can hold state in this comp.
+const MainNavigator = createDrawerNavigator(
+    {
+        Home: { screen: HomeNavigator },
+        Directory: { screen: DirectoryNavigator }
+    },
+    {
+        drawerBackgroundColor: '#CEC8FF'
+    }
+);
+
+class Main extends Component {
     render() {
         return (
-            // View comp: Like in React, in RN can only return and render one top-level comp, so use View comp wrapper. Set style prop to flex comp of normal size                 
             <View style={{
-                flex:1,
-                paddingTop: Platform.OS === 'ios' ? 0 : Expo.Constants.statusBarHeight         // To account for different device types (iOS vs Android), we'll set padding differently depending on device type using a React Native built-in comp called Platform that we imported
-                }} >              
-                <DirectoryNavigator />                                                                                       
-            </View>  
+                flex: 1,
+                paddingTop: Platform.OS === 'ios' ? 0 : Expo.Constants.statusBarHeight
+            }}>
+                <MainNavigator />
+            </View>
         );
     }
 }
