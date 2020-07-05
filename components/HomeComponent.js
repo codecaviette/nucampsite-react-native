@@ -5,7 +5,7 @@ import { CAMPSITES } from '../shared/campsites';
 import { PROMOTIONS } from '../shared/promotions';
 import { PARTNERS } from '../shared/partners';
 
-function RenderItem({item}) {
+function RenderItem({item}) {           // ({item}) = Object destructuring within RenderItem function
     if (item) {
         return (
             <Card
@@ -38,9 +38,10 @@ class Home extends Component {
 
     render() {
         return (
+            // item prop equals an object that's created by filtering through campsites array and returning first item where the campsite is the featured campsite
             <ScrollView>
                 <RenderItem 
-                    item={this.state.campsites.filter(campsite => campsite.featured)[0]} />
+                    item={this.state.campsites.filter(campsite => campsite.featured)[0]} />         
                 <RenderItem 
                     item={this.state.promotions.filter(promotion => promotion.featured)[0]} />
                 <RenderItem 

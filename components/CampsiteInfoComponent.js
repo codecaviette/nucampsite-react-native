@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { Card } from 'react-native-elements';
 import { CAMPSITES } from '../shared/campsites';
 
+
 function RenderCampsite({campsite}) {           // From the props object this component receives, we're only going to use the property of the campsite object, so we'll destructure it here in the params.
     if (campsite) {                             // We want to make sure campsite is not null or undefined, so use if stmt
         return (                                // if campsite is truthy, then return this card from RN Elements 3rd party UI library
@@ -19,7 +20,7 @@ function RenderCampsite({campsite}) {           // From the props object this co
     return <View /> ;                 // otherwise, if campsite is falsy...
 }
 
-class CampsiteInfo extends Component {           // Update this functional copm to a class comp so can hold state
+class CampsiteInfo extends Component {           // Update this functional comp to a class comp so can hold state;  or, can use hook with functional comp to hold state
     
     constructor(props) {                         // Create local state
         super(props);
