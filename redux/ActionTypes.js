@@ -1,3 +1,5 @@
+// This file has all possible action objects that we can dispatch to reducers to let the app know the current state, including when we're loading data, adding data, failed fetches
+
 export const CAMPSITES_LOADING = 'CAMPSITES_LOADING';
 export const ADD_CAMPSITES = 'ADD_CAMPSITES';
 export const CAMPSITES_FAILED = 'CAMPSITES_FAILED';

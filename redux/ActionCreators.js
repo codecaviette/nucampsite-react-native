@@ -1,7 +1,12 @@
 import * as ActionTypes from './ActionTypes';
-import { baseUrl } from '../shared/baseUrl';
+import { baseUrl } from '../shared/baseUrl';            // Using IP address from baseUrl file
 
-export const fetchComments = () => dispatch => {
+
+
+// In this fetchComments action creator, the action creator is wrapped in an extra function 
+// which means the redux thunk library will intercept it and stop the dispatch from going to a reducer; 
+// instead, it sends an asynch request to server using Fetch. Fetch returns promise which is handled via the promise chain  
+export const fetchComments = () => dispatch => {        
     return fetch(baseUrl + 'comments')
         .then(response => {
                 if (response.ok) {
@@ -17,7 +22,7 @@ export const fetchComments = () => dispatch => {
                 throw errMess;
             })
         .then(response => response.json())
-        .then(comments => dispatch(addComments(comments)))
+        .then(comments => dispatch(addComments(comments)))                  // Promise chain
         .catch(error => dispatch(commentsFailed(error.message)));
 };
 
