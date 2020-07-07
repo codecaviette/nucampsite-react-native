@@ -24,13 +24,13 @@ class Directory extends Component {             // Update Directory comp from fu
         const { navigate } = this.props.navigation;       // Since the navigate function is all we need from navigation prop reference we can destructure it like this; use this to navigate to a campsite depending on what campsite user taps on 
 
         // Define function used in FlatList
-        const renderDirectoryItem = ({item}) => {         // In this arrow fxn, for the params, by default, FlatLine passes an object as argument. We're only interested in one property of that object, item which we've destructured from passed state called campsites (in FlatList)
+        const renderDirectoryItem = ({item}) => {         // In this arrow fxn, for the params, by default, FlatLine passes an object as argument. We're only interested in one property of that object: item, which we've destructured from passed state called campsites (in FlatList)
             return (
                 <ListItem  
-                    title={item.name}                     // Destructure item property
+                    title={item.name}                     // Destructure item property; need {} so JSX parser knows to process item.name as JS rather than a string
                     subtitle={item.description}
                     onPress={() => navigate('CampsiteInfo', { campsiteId: item.id })}   // For onPress prop, we wrap navigate fxn in an arrow fxn so it can be called multiple times, ie each time it's pressed. If no arrow fxn, could only be called once and not reused. 
-                    leftAvatar={{ source: require('./images/react-lake.jpg')}}         // leftAvatar prop requires an object, so need double {} - first {} allows us to use JS in JSX (React HTML), second {} defines object literal. Object takes a property of source, plus a nodeJS "require"  
+                    leftAvatar={{ source: require('./images/react-lake.jpg')}}          // leftAvatar prop requires an object, so need double {} - first {} allows us to use JS in JSX (React HTML), second {} defines object literal. Object takes a property of source, plus a nodeJS "require"  
                 />
             );
         };
