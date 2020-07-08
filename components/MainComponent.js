@@ -11,6 +11,16 @@ import { View, Platform, StyleSheet, Text, ScrollView, Image } from 'react-nativ
 import { createStackNavigator, createDrawerNavigator, DrawerItems } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import SafeAreaView from 'react-native-safe-area-view';
+import { connect } from 'react-redux';
+import { fetchCampsites, fetchComments, fetchPromotions, fetchPartners } from '../redux/ActionCreators';        // Import our thunk'ed action creators
+
+
+const mapDispatchToProps = {            // This mapDispatchToProps object allows us to access these 4 thunk'ed action creators as props, just as mapStateToProps allowed us 
+    fetchCampsites,                     // to access state data as props. These action creators use Fetch to make asynchronous calls to get data from server.  
+    fetchComments,
+    fetchPromotions,
+    fetchPartners
+};
 
 
 // Stack Navigator for Home page
@@ -203,6 +213,14 @@ const MainNavigator = createDrawerNavigator(
 );
 
 class Main extends Component {
+
+    componentDidMount() {                       // Call the action creators after the component has been created
+        this.props.fetchCampsites();
+        this.props.fetchComments();
+        this.props.fetchPromotions();
+        this.props.fetchPartners();
+    }
+
     render() {
         return (
             <View style={{                         // Need {{}} to do in-line styling. Alternatively, we could create a variable below the class comp and define the styling there, 
@@ -246,4 +264,4 @@ const styles = StyleSheet.create({
 });
 
 
-export default Main;
+export default connect(null, mapDispatchToProps)(Main);             // Since we don't have a mapStateToProps function in this comp, we leave first space in first () as null

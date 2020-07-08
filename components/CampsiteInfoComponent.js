@@ -1,9 +1,18 @@
 import React, { Component } from "react";
 import { Text, View, ScrollView, FlatList } from "react-native";
 import { Card, Icon } from "react-native-elements";
-import { CAMPSITES } from "../shared/campsites";
-import { COMMENTS } from '../shared/comments';
+import { connect } from 'react-redux';                      // During conversion from React to Redux, connect replaces {CAMPSITES} and {COMMENTS} files
+import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling campsites/comments data from
+// import { CAMPSITES } from "../shared/campsites";         // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead of this file
+// import { COMMENTS } from '../shared/comments';
 
+
+const mapStateToProps = state => {      // This Redux function receives state as a prop from Redux store and returns only campsites and comments data from the state. This is the Redux way to signal what part of 
+  return {                              // the state we're interested in using, rather than grabbing the entire state.
+    campsites: state.campsites,         // In this comp, we're only interested in the campsites and comments data from the entire state
+    comments: state.comments
+    };
+};
 
 function RenderCampsite(props) {                     // In the render-return stmt, RenderCampsite is passed multiple props in the props object; we need all of them, instead of just some of them, so here, we're passing the entire props object as the argument
 
@@ -13,7 +22,7 @@ function RenderCampsite(props) {                     // In the render-return stm
         return (                                     // if campsite is truthy, then return this card from RN Elements 3rd party UI library
             <Card
                 featuredTitle={campsite.name}
-                image={require("./images/react-lake.jpg")} >
+                image={{uri: baseUrl + campsite.image}} >             {/* the uri tells the leftAvatar so use the baseUrl (server) and image of the item object for each campsite in the array */} 
                 
                 <Text style={{ margin: 10 }}>         {/* Text comp from RN; style prop uses {{}} bc it's an object in JSX - it looks like CSS but it's really JS - outer {} tells JSX parser that everything within in JS, inner {} is bc its an object which is what style attribute accepts  */}
                     {campsite.description}
@@ -64,8 +73,6 @@ class CampsiteInfo extends Component {                // Update this functional 
     constructor(props) {                              // Create local state
         super(props);
         this.state = {
-            campsites: CAMPSITES,
-            comments: COMMENTS, 
             favorite: false
         };
     }
@@ -80,8 +87,8 @@ class CampsiteInfo extends Component {                // Update this functional 
 
     render() {
         const campsiteId = this.props.navigation.getParam("campsiteId");        // React Navigation gives each screen component in your app access to the navigation prop automatically. The prop contains various convenience functions that dispatch navigation actions on the route's router, one being getParam which gets a specific param with fallback
-        const campsite = this.state.campsites.filter((campsite) => campsite.id === campsiteId)[0];
-        const comments = this.state.comments.filter(comment => comment.campsiteId === campsiteId);          // Create a comments variable (to render/display in return stmt below) by filtering through comments array and creating a new array where the comment being iterated has a campsiteId (comments.campsiteId) that matches the campsiteId of th campsite we want to display 
+        const campsite = this.props.campsites.campsites.filter((campsite) => campsite.id === campsiteId)[0];
+        const comments = this.props.comments.comments.filter(comment => comment.campsiteId === campsiteId);          // Create a comments variable (to render/display in return stmt below) by filtering through comments array and creating a new array where the comment being iterated has a campsiteId (comments.campsiteId) that matches the campsiteId of th campsite we want to display 
         
         return (
             // ScrollView: Top-level return can only return one item, so here we chose to use ScrollView to wrap multiple components
@@ -97,4 +104,4 @@ class CampsiteInfo extends Component {                // Update this functional 
     }
 }
 
-export default CampsiteInfo;
+export default connect(mapStateToProps)(CampsiteInfo);

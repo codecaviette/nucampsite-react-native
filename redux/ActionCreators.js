@@ -2,7 +2,6 @@ import * as ActionTypes from './ActionTypes';
 import { baseUrl } from '../shared/baseUrl';            // Using IP address from baseUrl file
 
 
-
 // In this fetchComments action creator, the action creator is wrapped in an extra function 
 // which means the redux thunk library will intercept it and stop the dispatch from going to a reducer; 
 // instead, it sends an asynch request to server using Fetch. Fetch returns promise which is handled via the promise chain  

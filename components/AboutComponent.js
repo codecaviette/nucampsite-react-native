@@ -1,7 +1,17 @@
 import React, { Component } from "react";
 import { ScrollView, Text, FlatList } from "react-native";
 import { Card, ListItem } from "react-native-elements";
-import { PARTNERS } from "../shared/partners";
+import { connect } from 'react-redux';                      // During conversion from React to Redux, connect replaces {PARTNERS} file
+import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling partners data from
+// import { PARTNERS } from "../shared/partners";           // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead
+
+
+const mapStateToProps = state => {      // This Redux function receives state as a prop from Redux store and returns only partners data from the state. This is the Redux way to signal what part of 
+  return {                              // the state we're interested in using, rather than grabbing the entire state.
+    partners: state.partners            // In this comp, we're only interested in the partners data from the entire state
+  }
+}
+
 
 function Mission() {
   return (
@@ -21,12 +31,7 @@ function Mission() {
 
 class About extends Component {
 
-  constructor(props) {
-    super(props);
-    this.state = {                          // Create local state
-      partners: PARTNERS,
-    };
-  }
+  // During React--Redux conversion, we removed the local state since we'll be accessing state from Redux store now. We also need to remove any reference to the local state below.
 
   static navigationOptions = {
     title: "About Us",
@@ -38,7 +43,7 @@ class About extends Component {
         <ListItem
           title={item.name}
           subtitle={item.description}
-          leftAvatar={{ source: require("./images/bootstrap-logo.png") }}
+          leftAvatar={{ source: {uri: baseUrl + item.image}}}       // the uri tells the leftAvatar so use the baseUrl and image of the item object for each partner in the array
         />
       );
     };
@@ -48,7 +53,7 @@ class About extends Component {
         <Mission />
         <Card title="Community Partners">
           <FlatList
-            data={this.state.partners}
+            data={this.props.partners.partners}              // this.props bc we inherited state from store and are now passing it to FlatList assigned to data prop. Why 2 partners? Look at partneres.js in redux folder: the 1st partners is the variable partners, and the 2nd is the partners array which is what we want.
             renderItem={renderPartner}                       // renderItem function has a built-in item property which expects an object, so we can destructure it in the renderPartner fxn
             keyExtractor={(item) => item.id.toString()}
           />
@@ -58,4 +63,4 @@ class About extends Component {
   }
 }
 
-export default About;
+export default connect(mapStateToProps)(About);              // Inserting connection function (from react-redux) ensures that the About comp receives partners props from the Redux store

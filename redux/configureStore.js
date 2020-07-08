@@ -10,7 +10,7 @@ import { partners } from './partners';
 
 export const ConfigureStore = () => {
     const store = createStore(
-        combineReducers({
+        combineReducers({                               // Must combine all reducers into one because store only accepts one reducer 
             campsites,
             comments,
             partners,
