@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { FlatList } from 'react-native';                    // These two comp's, FlatList and ListItem, work very well together; They are analogous to HTML's ul and li
+import { FlatList, View, Text } from 'react-native';                    // These two comp's, FlatList and ListItem, work very well together; They are analogous to HTML's ul and li
 import { Tile } from 'react-native-elements';               // During React--Redux conversion, we traded out ListItem for Tile
 import { connect } from 'react-redux';                      // During conversion from React to Redux, connect replaces {CAMPSITES} files
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling campsites data from
 // import { CAMPSITES } from "../shared/campsites";         // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead of this file
+import Loading from './LoadingComponent';
 
 
 const mapStateToProps = state => {          // This Redux function receives state as a prop from Redux store and returns only campsites data from the state. This is the Redux way to signal what part of 
@@ -36,6 +37,17 @@ class Directory extends Component {             // Update Directory comp from fu
             );
         };
 
+        // Depending on campsites' state, if stmt will update what's shown to user
+        if (this.props.campsites.isLoading) {               
+            return <Loading />;
+        }
+        if (this.props.campsites.errMess) {
+            return (
+                <View>
+                    <Text>{this.props.campsites.errMess}</Text>
+               </View>
+            );
+        }   
         return (                                                 // No <div> wrapper needed 
                 <FlatList                                        // FlatList comp expects some props: data, renderItem, keyExtractor. FlatList iterates through items in data prop and performs function specified in renderItem. 
                     data={this.props.campsites.campsites}        // data tells FlatList where it's getting its data from. FlatList expects data prop to get an array. We're setting this data prop equal to the passed prop from Redux store

@@ -4,6 +4,7 @@ import { Card, ListItem } from "react-native-elements";
 import { connect } from 'react-redux';                      // During conversion from React to Redux, connect replaces {PARTNERS} file
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling partners data from
 // import { PARTNERS } from "../shared/partners";           // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead
+import Loading from './LoadingComponent';                   // Loading comp does not need curly braces bc it is the default export
 
 
 const mapStateToProps = state => {      // This Redux function receives state as a prop from Redux store and returns only partners data from the state. This is the Redux way to signal what part of 
@@ -38,18 +39,40 @@ class About extends Component {
   };
 
   render() {
-    const renderPartner = ({ item }) => {
-      return (
-        <ListItem
-          title={item.name}
-          subtitle={item.description}
-          leftAvatar={{ source: {uri: baseUrl + item.image}}}       // the uri tells the leftAvatar so use the baseUrl and image of the item object for each partner in the array
-        />
-      );
+    const renderPartner = ({item}) => {
+        return (
+            <ListItem
+                title={item.name}
+                subtitle={item.description}
+                leftAvatar={{source: {uri: baseUrl + item.image}}}
+            />
+        );
     };
 
+    if (this.props.partners.isLoading) {
+        return (
+            <ScrollView>
+                <Mission />
+                <Card
+                    title='Community Partners'>
+                    <Loading />
+                </Card>
+            </ScrollView>
+        );
+    }
+    if (this.props.partners.errMess) {
+        return (
+            <ScrollView>
+                <Mission />
+                <Card
+                    title='Community Partners'>
+                    <Text>{this.props.partners.errMess}</Text>
+                </Card>
+            </ScrollView>
+        );
+    }
     return (
-      <ScrollView>
+        <ScrollView>
         <Mission />
         <Card title="Community Partners">
           <FlatList
