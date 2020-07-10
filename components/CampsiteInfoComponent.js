@@ -5,14 +5,21 @@ import { connect } from 'react-redux';                      // During conversion
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling campsites/comments data from
 // import { CAMPSITES } from "../shared/campsites";         // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead of this file
 // import { COMMENTS } from '../shared/comments';
+import { postFavorite } from '../redux/ActionCreators';
 
 
 const mapStateToProps = state => {      // This Redux function receives state as a prop from Redux store and returns only campsites and comments data from the state. This is the Redux way to signal what part of 
   return {                              // the state we're interested in using, rather than grabbing the entire state.
     campsites: state.campsites,         // In this comp, we're only interested in the campsites and comments data from the entire state
-    comments: state.comments
+    comments: state.comments,
+    favorites: state.favorites
     };
 };
+
+const mapDispatchToProps = {
+    postFavorite: campsiteId => (postFavorite(campsiteId))
+};
+
 
 function RenderCampsite(props) {                     // In the render-return stmt, RenderCampsite is passed multiple props in the props object; we need all of them, instead of just some of them, so here, we're passing the entire props object as the argument
 
@@ -20,11 +27,12 @@ function RenderCampsite(props) {                     // In the render-return stm
 
     if (campsite) {                                  // We want to make sure campsite is not null or undefined, so use if stmt
         return (                                     // if campsite is truthy, then return this card from RN Elements 3rd party UI library
+            // image: the uri tells the leftAvatar so use the baseUrl (server) and image of the item object for each campsite in the array 
             <Card
                 featuredTitle={campsite.name}
-                image={{uri: baseUrl + campsite.image}} >             {/* the uri tells the leftAvatar so use the baseUrl (server) and image of the item object for each campsite in the array */} 
+                image={{uri: baseUrl + campsite.image}} >             
                 
-                <Text style={{ margin: 10 }}>         {/* Text comp from RN; style prop uses {{}} bc it's an object in JSX - it looks like CSS but it's really JS - outer {} tells JSX parser that everything within in JS, inner {} is bc its an object which is what style attribute accepts  */}
+                <Text style={{ margin: 10 }}>                       {/* Text comp from RN; style prop uses {{}} bc it's an object in JSX - it looks like CSS but it's really JS - outer {} tells JSX parser that everything within in JS, inner {} is bc its an object which is what style attribute accepts  */}
                     {campsite.description}
                 </Text>
 
@@ -70,15 +78,9 @@ function RenderComments({ comments }) {              // In the render-return stm
 
 
 class CampsiteInfo extends Component {                // Update this functional comp to a class comp so can hold state;  or, can use hook with functional comp to hold state
-    constructor(props) {                              // Create local state
-        super(props);
-        this.state = {
-            favorite: false
-        };
-    }
 
-    markFavorite(){                                   // WHY would you not assign this function to a variable??
-        this.setState({favorite: true});
+    markFavorite(campsiteId){                                   // WHY would you not assign this function to a variable??
+        this.props.postFavorite(campsiteId);
     }
 
     static navigationOptions = {                      // Configure the text for the header title of each view by using static keyword (from JS) to apply a method on class itself rather than the object that's created from class
@@ -95,8 +97,8 @@ class CampsiteInfo extends Component {                // Update this functional 
                 // RenderComments: We're passing the comments array created above to the RenderComments comp as a prop; the comments array is wrapped in {} so JSX parser knows its JS within 
             <ScrollView>                
                 <RenderCampsite campsite={campsite} 
-                    favorite={this.state.favorite}
-                    markFavorite={() => this.markFavorite()}
+                    favorite={this.props.favorites.includes(campsiteId)}
+                    markFavorite={() => this.markFavorite(campsiteId)}
                 />
                 <RenderComments comments={comments} />          
             </ScrollView>
@@ -104,4 +106,4 @@ class CampsiteInfo extends Component {                // Update this functional 
     }
 }
 
-export default connect(mapStateToProps)(CampsiteInfo);
+export default connect(mapStateToProps, mapDispatchToProps)(CampsiteInfo);
