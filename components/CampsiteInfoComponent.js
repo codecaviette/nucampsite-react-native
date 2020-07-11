@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { Text, View, ScrollView, FlatList } from "react-native";
-import { Card, Icon } from "react-native-elements";
+import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet } from "react-native";
+import { Card, Icon, Rating, Input } from "react-native-elements";
 import { connect } from 'react-redux';                      // During conversion from React to Redux, connect replaces {CAMPSITES} and {COMMENTS} files
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling campsites/comments data from
 // import { CAMPSITES } from "../shared/campsites";         // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead of this file
 // import { COMMENTS } from '../shared/comments';
-import { postFavorite } from '../redux/ActionCreators';
+import { postFavorite, postComment } from '../redux/ActionCreators';
 
 
 const mapStateToProps = state => {      // This Redux function receives state as a prop from Redux store and returns only campsites and comments data from the state. This is the Redux way to signal what part of 
@@ -17,7 +17,8 @@ const mapStateToProps = state => {      // This Redux function receives state as
 };
 
 const mapDispatchToProps = {
-    postFavorite: campsiteId => (postFavorite(campsiteId))
+    postFavorite: campsiteId => (postFavorite(campsiteId)),
+    postComment: (campsiteId, rating, author, text) =>  postComment(campsiteId, rating, author, text),
 };
 
 
@@ -35,16 +36,26 @@ function RenderCampsite(props) {                     // In the render-return stm
                 <Text style={{ margin: 10 }}>                       {/* Text comp from RN; style prop uses {{}} bc it's an object in JSX - it looks like CSS but it's really JS - outer {} tells JSX parser that everything within in JS, inner {} is bc its an object which is what style attribute accepts  */}
                     {campsite.description}
                 </Text>
-
-                <Icon
-                    name={props.favorite ? 'heart' : 'heart-o' }
-                    type='font-awesome'
-                    color='#f50'
-                    raised
-                    reverse
-                    onPress={() => props.favorite ?
-                        console.log('Already set as a favorite') : props.markFavorite()}
-                />
+                <View style={styles.cardRow}>
+                    <Icon
+                        name={props.favorite ? 'heart' : 'heart-o' }
+                        type='font-awesome'
+                        color='#f50'
+                        raised
+                        reverse
+                        onPress={() => props.favorite ?
+                            console.log('Already set as a favorite') : props.markFavorite()}
+                    />
+                    <Icon
+                        name='pencil'
+                        type='font-awesome'
+                        color='#5637DD'
+                        raised
+                        reverse
+                        onPress={() => props.onShowModal()}
+                        style={styles.cardItem}
+                    />
+                </View>
             </Card>
         );
     }
@@ -59,7 +70,12 @@ function RenderComments({ comments }) {              // In the render-return stm
             // In 3rd Text element, use template literal syntax so we get a   -- and ,  displayed in the text
             <View style={{margin:10}}>
                 <Text style={{fontSize: 14}}>  {item.text} </Text>
-                <Text style={{fontSize: 12}}>  {item.rating} Stars </Text>
+                <Rating 
+                    startingValue={item.rating} 
+                    imageSize={10} 
+                    style={{ alignItems: 'flex-start', paddingVertical: '5%' }} 
+                    readonly 
+                />
                 <Text style={{fontSize: 12}}>  {`--${item.author}, ${item.date}`} </Text>           
             </View>
         )
@@ -79,13 +95,42 @@ function RenderComments({ comments }) {              // In the render-return stm
 
 class CampsiteInfo extends Component {                // Update this functional comp to a class comp so can hold state;  or, can use hook with functional comp to hold state
 
-    markFavorite(campsiteId){                                   // WHY would you not assign this function to a variable??
-        this.props.postFavorite(campsiteId);
+    constructor(props){
+        super(props);
+        this.state = {
+            showModal: false,
+            rating: 5,
+            author: '',
+            text: ''
+        }
     }
 
     static navigationOptions = {                      // Configure the text for the header title of each view by using static keyword (from JS) to apply a method on class itself rather than the object that's created from class
         title: "Campsite Information",
     };
+
+    markFavorite(campsiteId){                                   // WHY would you not assign this function to a variable??
+        this.props.postFavorite(campsiteId);
+    }
+
+    toggleModal(){
+        this.setState({ showModal: !this.state.showModal});
+    }
+
+    handleComment(campsiteId){
+        // console.log(JSON.stringify(this.state));            // This is a test that allows us to click submit modal to make sure it's grabbing info we need
+        this.props.postComment(campsiteId, this.state.rating, this.state.author, this.state.text);
+        this.toggleModal();
+    }
+
+    resetForm(){
+        this.setState({
+            showModal: false,
+            rating: 5,
+            author: '',
+            text: ''
+        })
+    }
 
     render() {
         const campsiteId = this.props.navigation.getParam("campsiteId");        // React Navigation gives each screen component in your app access to the navigation prop automatically. The prop contains various convenience functions that dispatch navigation actions on the route's router, one being getParam which gets a specific param with fallback
@@ -94,16 +139,79 @@ class CampsiteInfo extends Component {                // Update this functional 
         
         return (
             // ScrollView: Top-level return can only return one item, so here we chose to use ScrollView to wrap multiple components
+                // favorite: campsiteId is coming from const defined above
                 // RenderComments: We're passing the comments array created above to the RenderComments comp as a prop; the comments array is wrapped in {} so JSX parser knows its JS within 
             <ScrollView>                
-                <RenderCampsite campsite={campsite} 
+                <RenderCampsite 
+                    campsite={campsite} 
                     favorite={this.props.favorites.includes(campsiteId)}
                     markFavorite={() => this.markFavorite(campsiteId)}
+                    onShowModal={() => this.toggleModal()}
                 />
-                <RenderComments comments={comments} />          
+                <RenderComments comments={comments} /> 
+                <Modal 
+                    animationType={'slide'} 
+                    transparent={false} 
+                    visible={this.state.showModal} 
+                    onRequestClose={() => this.toggleModal()} >
+                    <View style={styles.modal}>
+                        <Rating 
+                            showRating
+                            startingValue={this.state.rating}
+                            imageSize={40}
+                            onFinishRating={(rating)=>this.setState({rating: rating})}      // As soon as you're done sliding finger/giving rating, it's taking final rating and doing a setState on it
+                            style={{paddingVertical: 10}}
+                        />
+                        <Input 
+                            placeholder='Author'
+                            leftIcon={<Icon name='user-o' type='font-awesome' /> }
+                            leftIconContainerStyle={{ paddingRight: 10 }}
+                            onChangeText={(text) => this.setState({ author: text})}         // As long as the param is not in {} the text can be named whatever - just matches whatever author is set to
+                            value={this.state.author}
+                        />
+                        <Input 
+                            placeholder='Comment'
+                            leftIcon={<Icon name='comment-o' type='font-awesome' /> }
+                            leftIconContainerStyle={{ paddingRight: 10 }}
+                            onChangeText={(text) => this.setState({ text: text})}
+                            value={this.state.text}
+                        />
+                        <View style={{ margin: 10 }}>
+                            <Button  
+                                title='Submit' 
+                                color={'#5637DD'} 
+                                onPress={() => {
+                                    this.handleComment(campsiteId); 
+                                    this.resetForm()
+                                }}  
+                            />        
+                        </View>
+                        <View style={{ margin: 10 }}>                       
+                            <Button title='Cancel' color={'#808080'} onPress={() => this.toggleModal()} />
+                        </View>
+                    </View>                    
+                </Modal>         
             </ScrollView>
         );
     }
 }
+
+const styles = StyleSheet.create({
+    cardRow: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+        flexDirection: 'row',
+        margin: 20
+    },
+    cardItem: {
+        flex:1, 
+        margin: 10
+    },
+    modal: {
+        justifyContent: 'center',
+        margin: 20
+    }
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(CampsiteInfo);
