@@ -109,7 +109,7 @@ class CampsiteInfo extends Component {                // Update this functional 
         title: "Campsite Information",
     };
 
-    markFavorite(campsiteId){                                   // WHY would you not assign this function to a variable??
+    markFavorite(campsiteId){                         // Bc we're in a class component, we cannot use the function keyword; instead, we create methods 
         this.props.postFavorite(campsiteId);
     }
 
