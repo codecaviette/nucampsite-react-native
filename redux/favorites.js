@@ -9,7 +9,8 @@ export const favorites = (state = [], action) => {          // state is initiali
                 return state;                               // will simply return the current state. The includes method takes a single argument, action.payload, and checks to see if it matches anything already in the array
             }
             return state.concat(action.payload);            // The concat array method makes copy of the original array and adds a new item to the end of it and returns a new array without modifying the original array
-
+        case ActionTypes.DELETE_FAVORITE:
+            return state.filter(favorite => favorite !== action.payload);
         default:
             return state;
     }
