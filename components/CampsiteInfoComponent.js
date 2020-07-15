@@ -6,6 +6,7 @@ import { baseUrl } from '../shared/baseUrl';                // During React--Red
 // import { CAMPSITES } from "../shared/campsites";         // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead of this file
 // import { COMMENTS } from '../shared/comments';
 import { postFavorite, postComment } from '../redux/ActionCreators';
+import * as Animatable from 'react-native-animatable';
 
 
 const mapStateToProps = state => {      // This Redux function receives state as a prop from Redux store and returns only campsites and comments data from the state. This is the Redux way to signal what part of 
@@ -29,34 +30,36 @@ function RenderCampsite(props) {                     // In the render-return stm
     if (campsite) {                                  // We want to make sure campsite is not null or undefined, so use if stmt
         return (                                     // if campsite is truthy, then return this card from RN Elements 3rd party UI library
             // image: the uri tells the leftAvatar so use the baseUrl (server) and image of the item object for each campsite in the array 
-            <Card
-                featuredTitle={campsite.name}
-                image={{uri: baseUrl + campsite.image}} >             
-                
-                <Text style={{ margin: 10 }}>                       {/* Text comp from RN; style prop uses {{}} bc it's an object in JSX - it looks like CSS but it's really JS - outer {} tells JSX parser that everything within in JS, inner {} is bc its an object which is what style attribute accepts  */}
-                    {campsite.description}
-                </Text>
-                <View style={styles.cardRow}>
-                    <Icon
-                        name={props.favorite ? 'heart' : 'heart-o' }
-                        type='font-awesome'
-                        color='#f50'
-                        raised
-                        reverse
-                        onPress={() => props.favorite ?
-                            console.log('Already set as a favorite') : props.markFavorite()}
-                    />
-                    <Icon
-                        name='pencil'
-                        type='font-awesome'
-                        color='#5637DD'
-                        raised
-                        reverse
-                        onPress={() => props.onShowModal()}
-                        style={styles.cardItem}
-                    />
-                </View>
-            </Card>
+            <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>               
+                <Card
+                    featuredTitle={campsite.name}
+                    image={{uri: baseUrl + campsite.image}} >             
+                    
+                    <Text style={{ margin: 10 }}>                       {/* Text comp from RN; style prop uses {{}} bc it's an object in JSX - it looks like CSS but it's really JS - outer {} tells JSX parser that everything within in JS, inner {} is bc its an object which is what style attribute accepts  */}
+                        {campsite.description}
+                    </Text>
+                    <View style={styles.cardRow}>
+                        <Icon
+                            name={props.favorite ? 'heart' : 'heart-o' }
+                            type='font-awesome'
+                            color='#f50'
+                            raised
+                            reverse
+                            onPress={() => props.favorite ?
+                                console.log('Already set as a favorite') : props.markFavorite()}
+                        />
+                        <Icon
+                            name='pencil'
+                            type='font-awesome'
+                            color='#5637DD'
+                            raised
+                            reverse
+                            onPress={() => props.onShowModal()}
+                            style={styles.cardItem}
+                        />
+                    </View>
+                </Card>
+            </Animatable.View>
         );
     }
         return <View />;         // otherwise, if campsite is falsy, return the View RN element
@@ -82,13 +85,15 @@ function RenderComments({ comments }) {              // In the render-return stm
     }
 
     return (
-        <Card title='Comments'>
-            <FlatList                                // Bc we know our incoming data (comments array) is an array, we can use FlatList which expects an array
-                data={comments}                      // data = comments array
-                renderItem={renderCommentItem}       // We'll create this function
-                keyExtractor={item => item.id.toString()}       // Bc each comment has a unique id, we can set that to be its unique key
-            />
-        </Card>
+        <Animatable.View animation='fadeInUp' duration={2000} delay={1000}>   
+            <Card title='Comments'>
+                <FlatList                                // Bc we know our incoming data (comments array) is an array, we can use FlatList which expects an array
+                    data={comments}                      // data = comments array
+                    renderItem={renderCommentItem}       // We'll create this function
+                    keyExtractor={item => item.id.toString()}       // Bc each comment has a unique id, we can set that to be its unique key
+                />
+            </Card>
+        </Animatable.View>
     )
 }
 

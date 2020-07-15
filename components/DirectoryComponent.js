@@ -5,6 +5,7 @@ import { connect } from 'react-redux';                      // During conversion
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling campsites data from
 // import { CAMPSITES } from "../shared/campsites";         // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead of this file
 import Loading from './LoadingComponent';
+import * as Animatable from 'react-native-animatable';
 
 
 const mapStateToProps = state => {          // This Redux function receives state as a prop from Redux store and returns only campsites data from the state. This is the Redux way to signal what part of 
@@ -27,13 +28,15 @@ class Directory extends Component {             // Update Directory comp from fu
         // Define function used in FlatList
         const renderDirectoryItem = ({item}) => {         // In this arrow fxn, for the params, by default, FlatLine passes an object as argument. We're only interested in one property of that object: item, which we've destructured from passed state called campsites (in FlatList)
             return (
-                <Tile  
-                    title={item.name}                     // Destructure item property; need {} so JSX parser knows to process item.name as JS rather than a string
-                    caption={item.description}
-                    featured
-                    onPress={() => navigate('CampsiteInfo', { campsiteId: item.id })}   // For onPress prop, we wrap navigate fxn in an arrow fxn so it can be called multiple times, ie each time it's pressed. If no arrow fxn, could only be called once and not reused. 
-                    imageSrc={{uri: baseUrl + item.image}}
-                    />
+                <Animatable.View animation='fadeInRightBig' duration={2000} >   
+                    <Tile  
+                        title={item.name}                     // Destructure item property; need {} so JSX parser knows to process item.name as JS rather than a string
+                        caption={item.description}
+                        featured
+                        onPress={() => navigate('CampsiteInfo', { campsiteId: item.id })}   // For onPress prop, we wrap navigate fxn in an arrow fxn so it can be called multiple times, ie each time it's pressed. If no arrow fxn, could only be called once and not reused. 
+                        imageSrc={{uri: baseUrl + item.image}}
+                        />
+                </Animatable.View>
             );
         };
 

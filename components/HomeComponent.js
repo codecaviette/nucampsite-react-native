@@ -52,7 +52,7 @@ class Home extends Component {
         super(props);
         this.state = {
             scaleValue: new Animated.Value(0)       // Key name is arbitrary - doesn't have to be called scaleValue, but it helps to be descriptive.
-        }
+        };
     }
 
     animate() {                                     // The animate method's name is arbitrary - can be anything.
@@ -60,7 +60,7 @@ class Home extends Component {
             this.state.scaleValue,                  // 1st argument: name of animated value that we want to have change over time
             {                                       // 2nd argument: toValue = what we want the animated value to change to from its initial value
                 toValue: 1,                                 // duration = hwo long it'll take from animate from 0 to 1, which is 1500 milliseconds
-                duration: 1500, 
+                duration: 1500 
             }
         ).start();                                  // This starts the animation
     }
@@ -97,3 +97,4 @@ class Home extends Component {
     }
 }
 
+export default connect(mapStateToProps)(Home);

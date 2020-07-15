@@ -5,7 +5,7 @@ import { connect } from 'react-redux';                      // During conversion
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling partners data from
 // import { PARTNERS } from "../shared/partners";           // During React--Redux conversion, removed this b/c we'll be pulling this data from the json-server instead
 import Loading from './LoadingComponent';                   // Loading comp does not need curly braces bc it is the default export
-
+import * as Animatable from 'react-native-animatable';
 
 const mapStateToProps = state => {      // This Redux function receives state as a prop from Redux store and returns only partners data from the state. This is the Redux way to signal what part of 
   return {                              // the state we're interested in using, rather than grabbing the entire state.
@@ -63,24 +63,28 @@ class About extends Component {
     if (this.props.partners.errMess) {
         return (
             <ScrollView>
-                <Mission />
-                <Card
-                    title='Community Partners'>
-                    <Text>{this.props.partners.errMess}</Text>
-                </Card>
+                <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>   
+                  <Mission />
+                  <Card
+                      title='Community Partners'>
+                      <Text>{this.props.partners.errMess}</Text>
+                  </Card>
+                </Animatable.View>
             </ScrollView>
         );
     }
     return (
         <ScrollView>
-        <Mission />
-        <Card title="Community Partners">
-          <FlatList
-            data={this.props.partners.partners}              // this.props bc we inherited state from store and are now passing it to FlatList assigned to data prop. Why 2 partners? Look at partneres.js in redux folder: the 1st partners is the variable partners, and the 2nd is the partners array which is what we want.
-            renderItem={renderPartner}                       // renderItem function has a built-in item property which expects an object, so we can destructure it in the renderPartner fxn
-            keyExtractor={(item) => item.id.toString()}
-          />
-        </Card>
+          <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>   
+            <Mission />
+            <Card title="Community Partners">
+              <FlatList
+                data={this.props.partners.partners}              // this.props bc we inherited state from store and are now passing it to FlatList assigned to data prop. Why 2 partners? Look at partneres.js in redux folder: the 1st partners is the variable partners, and the 2nd is the partners array which is what we want.
+                renderItem={renderPartner}                       // renderItem function has a built-in item property which expects an object, so we can destructure it in the renderPartner fxn
+                keyExtractor={(item) => item.id.toString()}
+              />
+            </Card>
+          </Animatable.View>  
       </ScrollView>
     );
   }
