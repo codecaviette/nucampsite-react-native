@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { FlatList, View, Text } from 'react-native';
+import { FlatList, View, Text, Alert } from 'react-native';
 import { ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
 import Swipeout from 'react-native-swipeout';
@@ -28,9 +28,26 @@ class Favorites extends Component {
         const renderFavoriteItem = ({item}) => {                // WHERE IS ITEM COMING FROM? CAN IT BE NAMED ANYTHING? 
             const rightButton = [
                 {
-                    text: 'Delete',
+                    text: 'Delete', 
                     type: 'delete',
-                    onPress: () => this.props.deleteFavorite(item.id)
+                    onPress: () => {
+                        Alert.alert(
+                            'Delete Favorite?',
+                            'Are you sure you wish to delete the favorite campsite ' + item.name + '?',
+                            [
+                                { 
+                                    text: 'Cancel', 
+                                    onPress: () => console.log(item.name + 'Not Deleted'),
+                                    style: ' cancel'
+                                },
+                                {
+                                    text: 'OK',
+                                    onPress: () => this.props.deleteFavorite(item.id)
+                                }
+                            ],
+                            { cancelable: false }
+                        );
+                    }
                 }
             ];
             return (
