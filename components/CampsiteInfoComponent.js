@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet } from "react-native";
+import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet, Alert, PanResponder } from "react-native";
 import { Card, Icon, Rating, Input } from "react-native-elements";
 import { connect } from 'react-redux';                      // During conversion from React to Redux, connect replaces {CAMPSITES} and {COMMENTS} files
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling campsites/comments data from
@@ -27,10 +27,43 @@ function RenderCampsite(props) {                     // In the render-return stm
 
     const {campsite} = props;                        // Destructure campsite object/array from entire props object that was passed to RenderCampsite comp
 
+    const recognizeDrag = ({dx}) => (dx < -200) ? true : false;             // This arrow function's parameter takes object and destructures from it a property called dx, which is the distance of a gesture across x-axis 
+
+    const panResponder = PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
+        onPanResponderEnd: (e, gestureState) => {
+            console.log('pan responder end', gestureState);
+            if (recognizeDrag(gestureState)) {
+                Alert.alert(
+                    'Add Favorite',
+                    'Are you sure you wish to add ' + campsite.name + ' to favorites?',
+                    [
+                        {
+                            text: 'Cancel',
+                            style: 'cancel',
+                            onPress: () => console.log('Cancel Pressed')
+                        },
+                        {
+                            text: 'OK',
+                            onPress: () => props.favorite ?
+                                console.log('Already set as a favorite') : props.markFavorite()
+                        }
+                    ],
+                    { cancelable: false }
+                );
+            }
+            return true;
+        }
+    });
+
     if (campsite) {                                  // We want to make sure campsite is not null or undefined, so use if stmt
         return (                                     // if campsite is truthy, then return this card from RN Elements 3rd party UI library
             // image: the uri tells the leftAvatar so use the baseUrl (server) and image of the item object for each campsite in the array 
-            <Animatable.View animation='fadeInDown' duration={2000} delay={1000}>               
+            <Animatable.View 
+                animation='fadeInDown' 
+                duration={2000} 
+                delay={1000}
+                {...panResponder.panHandlers} >               
                 <Card
                     featuredTitle={campsite.name}
                     image={{uri: baseUrl + campsite.image}} >             
