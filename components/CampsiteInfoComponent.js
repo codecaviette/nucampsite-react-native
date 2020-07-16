@@ -27,10 +27,16 @@ function RenderCampsite(props) {                     // In the render-return stm
 
     const {campsite} = props;                        // Destructure campsite object/array from entire props object that was passed to RenderCampsite comp
 
+    const view = React.createRef();                  // Refs are similar to, in web dev, assigning an id attribute to an HTML element so you can refer to it in JS with getElementById 
+
     const recognizeDrag = ({dx}) => (dx < -200) ? true : false;             // This arrow function's parameter takes object and destructures from it a property called dx, which is the distance of a gesture across x-axis 
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
+        onPanResponderGrant: () => {
+            view.current.rubberBand(1000)
+            .then(endState => console.log(endState.finished ? 'finished' : 'canceled'));
+        },
         onPanResponderEnd: (e, gestureState) => {
             console.log('pan responder end', gestureState);
             if (recognizeDrag(gestureState)) {
@@ -63,6 +69,7 @@ function RenderCampsite(props) {                     // In the render-return stm
                 animation='fadeInDown' 
                 duration={2000} 
                 delay={1000}
+                ref={view}
                 {...panResponder.panHandlers} >               
                 <Card
                     featuredTitle={campsite.name}
