@@ -8,10 +8,19 @@ import { comments } from './comments';
 import { promotions } from './promotions';
 import { partners } from './partners';
 import { favorites } from './favorites';
+import { persistStore, persistCombineReducers } from 'redux-persist';       // These allow for persistant storage whenever there's a change to state
+import storage from 'redux-persist/es/storage';
+
+
+const config = {            // config object for persistant store - 1st two are required
+    key: 'root',
+    storage,
+    debug: true
+}
 
 export const ConfigureStore = () => {
     const store = createStore(
-        combineReducers({                               // Must combine all reducers into one because store only accepts one reducer 
+        persistCombineReducers(config, {                          
             campsites,
             comments,
             partners,
@@ -21,5 +30,7 @@ export const ConfigureStore = () => {
         applyMiddleware(thunk, logger)
     );
 
-    return store;
+    const persistor = persistStore(store);
+
+    return { persistor, store };
 }
