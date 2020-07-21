@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Text, View, ScrollView, StyleSheet, Picker, Switch, Button, Modal, Alert } from 'react-native';
 import DatePicker from 'react-native-datepicker';
 import * as Animatable from 'react-native-animatable';
+import * as Permissions from 'expo-permissions';            // Import all exports from expo-permissions into Permissions namespace
+import { Notifications } from 'expo';
 
 
 // We're creating the form as a React controlled form where form data is stored in and controlled in the form, rather than Redux
@@ -28,6 +30,30 @@ class Reservation extends Component {
             date: '',
         });
     }
+
+    // Asynchronous function to request permission to send local notifications (async/await new in ES8)
+    async obtainNotificationPermission() {
+        const permission = await Permissions.getAsync(Permissions.USER_FACING_NOTIFICATIONS);               // await is JS keyword that can only be used within async function
+        if (permission.status !== 'granted') {
+            const permission = await Permissions.askAsync(Permissions.USER_FACING_NOTIFICATIONS);
+            if (permission.status !== 'granted') {
+                Alert.alert('Permission not granted to show notifications');
+            }
+            return permission;
+        }
+        return permission;
+    }
+
+    async presentLocalNotification(date) {
+        const permission = await this.obtainNotificationPermission();
+        if (permission.status === 'granted') {
+            Notifications.presentLocalNotificationAsync({
+                title: 'Your Campsite Reservation Search',
+                body: 'Search for ' + date + ' requested'
+            });
+        }
+    }
+    
 
     render() {
         return (
@@ -97,6 +123,7 @@ class Reservation extends Component {
                             {
                                 text: 'OK',
                                 onPress: () => {
+                                    this.presentLocalNotification(this.state.date);
                                     this.resetForm();     
                                 },
                             }] )}
