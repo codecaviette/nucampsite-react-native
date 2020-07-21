@@ -9,6 +9,7 @@ import About from './AboutComponent';
 import Contact from './ContactComponent';
 import Reservation from './ReservationComponent';
 import Favorites from './FavoritesComponent';
+import Login from './LoginComponent';
 import { View, Platform, StyleSheet, Text, ScrollView, Image } from 'react-native';
 import { createStackNavigator, createDrawerNavigator, DrawerItems } from 'react-navigation';
 import { Icon } from 'react-native-elements';
@@ -151,6 +152,7 @@ const ReservationNavigator = createStackNavigator(
     }
 );
 
+// Stack Navigator for Favorites page
 const FavoritesNavigator = createStackNavigator(
     {
         Favorites: { screen: Favorites }
@@ -166,6 +168,30 @@ const FavoritesNavigator = createStackNavigator(
             },
             headerLeft: <Icon
                 name='heart'
+                type='font-awesome'
+                iconStyle={styles.stackIcon}
+                onPress={() => navigation.toggleDrawer()}
+            />
+        })
+    }
+);
+
+// Stack Navigator for Login page
+const LoginNavigator = createStackNavigator(
+    {
+        Login: { screen: Login }
+    },
+    {
+        navigationOptions: ({navigation}) => ({
+            headerStyle: {
+                backgroundColor: '#5637DD'
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+                color: '#fff'
+            },
+            headerLeft: <Icon
+                name='sign-in'
                 type='font-awesome'
                 iconStyle={styles.stackIcon}
                 onPress={() => navigation.toggleDrawer()}
@@ -201,6 +227,19 @@ const CustomDrawerContentComponent = props => (                     // This unna
 // Drawer Navigator slides out from side of app; from here, can access Stack Navigators
 const MainNavigator = createDrawerNavigator(
     {
+        Login: {
+            screen: LoginNavigator,
+            navigationOptions: {
+                drawerIcon: ({tintColor}) => (
+                    <Icon
+                        name='sign-in'
+                        type='font-awesome'
+                        size={24}
+                        color={tintColor}
+                    />
+                )
+            }
+        },
         Home: {
             screen: HomeNavigator,
             navigationOptions: {
@@ -285,8 +324,9 @@ const MainNavigator = createDrawerNavigator(
         }
     },
     {
+        initialRouteName: 'Home',                               // Tells app to go to Home screen whenever it's initially opened
         drawerBackgroundColor: '#CEC8FF',
-        contentComponent: CustomDrawerContentComponent          // tells main navigator to use that component to render the content of side drawer
+        contentComponent: CustomDrawerContentComponent          // Tells main navigator to use that component to render the content of side drawer
     }
 );
 

@@ -26,10 +26,9 @@ const mapDispatchToProps = {
 function RenderCampsite(props) {                     // In the render-return stmt, RenderCampsite is passed multiple props in the props object; we need all of them, instead of just some of them, so here, we're passing the entire props object as the argument
 
     const {campsite} = props;                        // Destructure campsite object/array from entire props object that was passed to RenderCampsite comp
-
     const view = React.createRef();                  // Refs are similar to, in web dev, assigning an id attribute to an HTML element so you can refer to it in JS with getElementById 
-
-    const recognizeDrag = ({dx}) => (dx < -200) ? true : false;             // This arrow function's parameter takes object and destructures from it a property called dx, which is the distance of a gesture across x-axis 
+    const recognizeDrag = ({dx}) => (dx < -200) ? true : false;             // Goes w onPanResponderEnd: This arrow function's parameter takes object and destructures from it a property called dx (a built-in prop from gestureState), which is the distance of a gesture across x-axis; -200 would be 200 pixels to the left, as you start at 0
+    const recognizeComment = ({dx}) => (dx > 200) ? true : false;           // Goes w onPanResponderEnd: This returns true for a gesture from left to right that is over 200px, and false otherwise. dx is a built-in prop of gestureState - refer to doc
 
     const panResponder = PanResponder.create({
         onStartShouldSetPanResponder: () => true,
@@ -37,7 +36,7 @@ function RenderCampsite(props) {                     // In the render-return stm
             view.current.rubberBand(1000)
             .then(endState => console.log(endState.finished ? 'finished' : 'canceled'));
         },
-        onPanResponderEnd: (e, gestureState) => {
+        onPanResponderEnd: (e, gestureState) => {               // 
             console.log('pan responder end', gestureState);
             if (recognizeDrag(gestureState)) {
                 Alert.alert(
@@ -57,6 +56,8 @@ function RenderCampsite(props) {                     // In the render-return stm
                     ],
                     { cancelable: false }
                 );
+            } else if (recognizeComment(gestureState)) {
+                props.onShowModal();
             }
             return true;
         }
