@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import { Text, View, ScrollView, FlatList, Modal, Button, StyleSheet, Alert, PanResponder } from "react-native";
+import { Text, View, ScrollView, FlatList, Modal, Button, 
+    StyleSheet, Alert, PanResponder, Share } from "react-native";
 import { Card, Icon, Rating, Input } from "react-native-elements";
 import { connect } from 'react-redux';                      // During conversion from React to Redux, connect replaces {CAMPSITES} and {COMMENTS} files
 import { baseUrl } from '../shared/baseUrl';                // During React--Redux conversion, imported this bc it includes my IP address which is where we'll be pulling campsites/comments data from
@@ -63,6 +64,18 @@ function RenderCampsite(props) {                     // In the render-return stm
         }
     });
 
+    // Implement inner function for socially sharing via app
+    const shareCampsite = (title, message, url) => {
+        // Use RN's Share API's share method
+        Share.share({
+            title, 
+            message: `${title}: ${message} ${url}`,
+            url
+        }, {
+            dialogTitle: 'Share ' + title
+        })
+    }
+
     if (campsite) {                                  // We want to make sure campsite is not null or undefined, so use if stmt
         return (                                     // if campsite is truthy, then return this card from RN Elements 3rd party UI library
             // image: the uri tells the leftAvatar so use the baseUrl (server) and image of the item object for each campsite in the array 
@@ -97,6 +110,15 @@ function RenderCampsite(props) {                     // In the render-return stm
                             reverse
                             onPress={() => props.onShowModal()}
                             style={styles.cardItem}
+                        />
+                        <Icon
+                            name={'share'}
+                            type='font-awesome'
+                            color='#5637DD'
+                            style={styles.cardItem}
+                            raised
+                            reverse
+                            onPress={() => shareCampsite(campsite.name, campsite.description, baseUrl + campsite.image)} 
                         />
                     </View>
                 </Card>
@@ -242,6 +264,7 @@ class CampsiteInfo extends Component {                // Update this functional 
     }
 }
 
+// Create hoisted (vs in-line) styling using StyleSheet
 const styles = StyleSheet.create({
     cardRow: {
         alignItems: 'center',
