@@ -10,12 +10,13 @@ import Contact from './ContactComponent';
 import Reservation from './ReservationComponent';
 import Favorites from './FavoritesComponent';
 import Login from './LoginComponent';
-import { View, Platform, StyleSheet, Text, ScrollView, Image } from 'react-native';
+import { View, Platform, StyleSheet, Text, ScrollView, Image, Alert, ToastAndroid } from 'react-native';
 import { createStackNavigator, createDrawerNavigator, DrawerItems } from 'react-navigation';
 import { Icon } from 'react-native-elements';
 import SafeAreaView from 'react-native-safe-area-view';
 import { connect } from 'react-redux';
 import { fetchCampsites, fetchComments, fetchPromotions, fetchPartners } from '../redux/ActionCreators';        // Import our thunk'ed action creators
+import NetInfo from '@react-native-community/netinfo';
 
 
 const mapDispatchToProps = {            // This mapDispatchToProps object allows us to access these 4 thunk'ed action creators as props, just as mapStateToProps allowed us 
@@ -200,7 +201,6 @@ const LoginNavigator = createStackNavigator(
     }
 );
 
-
 // Define custom drawer
 const CustomDrawerContentComponent = props => (                     // This unnamed/anonymous function receives props as its param/placeholder and will return the view of our customized drawer
     // ScrollView wraps everything
@@ -332,11 +332,46 @@ const MainNavigator = createDrawerNavigator(
 
 class Main extends Component {
 
-    componentDidMount() {                       // Call the action creators after the component has been created
+    componentDidMount() {                       // This is a lifecycle method, and everything within it happens when comp loads. Call the action creators after the component has been created
         this.props.fetchCampsites();
         this.props.fetchComments();
         this.props.fetchPromotions();
         this.props.fetchPartners();
+
+        NetInfo.fetch().then(connectionInfo => {            // Use fetch() method of the NetInfo Library to obtain network connection state once. THEN, returns promise that resolves to a NetInfoState object, we're choosing to call connectionInfo (but can be called anything). Could INSTEAD use more modern async/await syntax. 
+            (Platform.OS === 'ios') ?                       // Check for the platform operating system using Platform API and ternary operator to determine what user is shown. 
+                Alert.alert('Initial Network Connectivity Type: ', connectionInfo.type)
+                : ToastAndroid.show('Initial Network Connectivity Type: ' +
+                    connectionInfo.type, ToastAndroid.LONG);
+        });
+
+        this.unsubscribeNetInfo = NetInfo.addEventListener(connectionInfo => {        // Must use the "this" keyword on unsubscribeNetInfo method so that we can use it later. Since we're already within a method, we need to use "this" to specify this is a method on the PARENT class (Main) rather than a local variable of the componentDidMount method  
+            this.handleConnectivityChange(connectionInfo);
+        });
+    }
+
+    componentWillUnmount(){
+        this.unsubscribeNetInfo();
+    }
+
+    handleConnectivityChange = connectionInfo => {
+        let connectionMsg = 'You are now connected to an active network.';
+        switch (connectionInfo.typoe) {
+            case 'none':
+                connectionMsg = 'No network connection is active.';
+                break;
+            case 'unknown':
+                connectionMsg = 'The network connection state is now unknown.';
+                break;
+            case 'cellular':
+                connectionMsg = 'You are now connected to a cellular network.';
+                break;
+            case 'wifi':
+                connectionMsg = 'You are now connected to a WiFi network.';
+                break;
+        }
+        (Platform.OS === 'ios') ? Alert.alert('Connection change:', connectionMsg)
+            : ToastAndroid.show(connectionMsg, ToastAndroid.LONG);
     }
 
     render() {
