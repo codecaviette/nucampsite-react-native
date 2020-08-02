@@ -6,6 +6,8 @@ import * as ImagePicker from 'expo-image-picker';
 import * as Permissions from 'expo-permissions';
 import { createBottomTabNavigator } from 'react-navigation';
 import { baseUrl } from '../shared/baseUrl';
+import * as ImageManipulator from "expo-image-manipulator";
+import { SaveFormat } from "expo-image-manipulator";
 
 
 class LoginTab extends Component {
@@ -35,20 +37,23 @@ class LoginTab extends Component {
         // If the state's remember property is true, or checked, then save the username/password in secure store's state to whatever's entered in using SecureStore.setItemAsync method. 
         if (this.state.remember) {
             // All SecureStore methods require an argument of key (userinfo); (setItemAsync also requires a value argument (username/password), which needs to be a string value in order to be stored, so we use JSON.stringify to convert object to string)
-            SecureStore.setItemAsync('userinfo', JSON.stringify(
-                {username: this.state.username, password: this.state.password}))
+            SecureStore.setItemAsync(
+                'userinfo', 
+                JSON.stringify({
+                    username: this.state.username, 
+                    password: this.state.password
+                }))
                 // All SecureStore methods return a promise that will reject if there's an error. Check for rejected promise using .catch 
                 .catch(error => console.log('Could not save user info', error));
         // If the state's remember property is false, or not checked, then it will delete any data stored under the userinfo key
         } else {
-            SecureStore.deleteItemAsync('userinfo')
-                .catch(error => console.log('Could not delete user info', error));
+            SecureStore.deleteItemAsync('userinfo').catch(error => 
+                console.log('Could not delete user info', error));
         }
     }
 
     componentDidMount() {
-        SecureStore.getItemAsync('userinfo')
-            .then(userdata => {
+        SecureStore.getItemAsync('userinfo').then(userdata => {
                 const userinfo = JSON.parse(userdata);
                 if(userinfo){
                     this.setState({username: userinfo.username});
@@ -97,10 +102,10 @@ class LoginTab extends Component {
                                 name='sign-in'
                                 type='font-awesome'
                                 color='#fff'
-                                iconStyle={{marginRight: 10}}
+                                iconStyle={{ marginRight: 10 }}
                             />
                         }
-                        buttonStyle={{backgroundColor: '#5637DD'}}
+                        buttonStyle={{ backgroundColor: '#5637DD' }}
                     />
                 </View>
                 <View style={styles.formButton}>
@@ -142,7 +147,7 @@ class RegisterTab extends Component {
 
     static navigationOptions = {
         title: 'Register',
-        tabBarIcon: ({tintColor}) => (
+        tabBarIcon: ({ tintColor }) => (
             <Icon
                 name='user-plus'
                 type='font-awesome'
@@ -162,10 +167,45 @@ class RegisterTab extends Component {
             });
             if (!capturedImage.cancelled) {
                 console.log(capturedImage);
-                this.setState({imageUrl: capturedImage.uri});
+                const processedImage = await this.processImage(capturedImage.uri);
+                MediaLibrary.createAssetAync(processedImage.uri);
+                this.processImage(capturedImage.uri);
             }
-        }
-    }
+            }
+          };
+          getImageFromGallery = async () => {
+            const cameraRollPermissions = await Permissions.askAsync(
+              Permissions.CAMERA_ROLL
+            );
+            if (cameraRollPermissions.status === "granted") {
+              const capturedImage = await ImagePicker.launchImageLibraryAsync({
+                allowsEditing: true,
+                aspect: [1, 1],
+              });
+              if (!capturedImage.cancelled) {
+                console.log(capturedImage);
+                this.processImage(capturedImage.uri);
+              }
+            }
+          };
+          processImage = async (imgUri) => {
+            const processedImage = await ImageManipulator.manipulateAsync(
+              imgUri,
+              [
+                {
+                  resize: {
+                    width: 400,
+                  },
+                },
+              ],
+              {
+                format: SaveFormat.PNG,
+              }
+            );
+            console.log(processedImage);
+            this.setState({ imageUrl: processedImage.uri });
+          };
+        
 
     handleRegister() {
         console.log(JSON.stringify(this.state));
@@ -192,6 +232,10 @@ class RegisterTab extends Component {
                         <Button
                             title='Camera'
                             onPress={this.getImageFromCamera}
+                        />
+                        <Button
+                            title='Gallery'
+                            onPress={this.getImageFromGallery}
                         />
                     </View>
                     <Input

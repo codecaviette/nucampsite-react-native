@@ -333,12 +333,12 @@ const MainNavigator = createDrawerNavigator(
 class Main extends Component {
 
     componentDidMount() {                       // This is a lifecycle method, and everything within it happens when comp loads. Call the action creators after the component has been created
-        this.props.fetchCampsites();
+        this.props.fetchCampsites();            // These fetches are the "fire and forget" type, as they're shooting data into redux pipeline
         this.props.fetchComments();
         this.props.fetchPromotions();
         this.props.fetchPartners();
-
-        NetInfo.fetch().then(connectionInfo => {            // Use fetch() method of the NetInfo Library to obtain network connection state once. THEN, returns promise that resolves to a NetInfoState object, we're choosing to call connectionInfo (but can be called anything). Could INSTEAD use more modern async/await syntax. 
+                                                            // We use promise.then with fetch so that this step does not block this.unsuscribeNetInfo function
+        NetInfo.fetch().then(connectionInfo => {            // Use fetch() method of the NetInfo Library to obtain network connection state once. THEN, returns promise that resolves to a NetInfoState object, we're choosing to call connectionInfo (but can be called anything). Could INSTEAD use more modern async/await syntax.  
             (Platform.OS === 'ios') ?                       // Check for the platform operating system using Platform API and ternary operator to determine what user is shown. 
                 Alert.alert('Initial Network Connectivity Type: ', connectionInfo.type)
                 : ToastAndroid.show('Initial Network Connectivity Type: ' +
@@ -351,9 +351,9 @@ class Main extends Component {
     }
 
     componentWillUnmount(){
-        this.unsubscribeNetInfo();
+        this.unsubscribeNetInfo();            
     }
-
+ 
     handleConnectivityChange = connectionInfo => {
         let connectionMsg = 'You are now connected to an active network.';
         switch (connectionInfo.typoe) {
@@ -386,7 +386,7 @@ class Main extends Component {
     }
 }
 
-
+// Use Stylesheet to define hoisted styling
 const styles = StyleSheet.create({
     container: {
         flex: 1,
