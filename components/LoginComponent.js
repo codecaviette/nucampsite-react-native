@@ -169,7 +169,6 @@ class RegisterTab extends Component {
                 console.log(capturedImage);
                 const processedImage = await this.processImage(capturedImage.uri);
                 MediaLibrary.createAssetAync(processedImage.uri);
-                this.processImage(capturedImage.uri);
             }
             }
           };
