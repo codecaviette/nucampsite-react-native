@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-native-community/netinfo": "5.0.0",
+    "browserslist": "^4.16.5",
     "expo": "35.0.0",
     "expo-image-manipulator": "7.0.0",
     "expo-image-picker": "7.0.0",
