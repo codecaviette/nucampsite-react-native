@@ -22,6 +22,7 @@
     "hosted-git-info": "^2.8.9",
     "isomorphic-fetch": "^3.0.0",
     "lodash": "^4.17.21",
+    "node-notifier": "^5.2.1",
     "os-locale": "^5.0.0",
     "plist": "^3.0.2",
     "react": "16.8.3",
